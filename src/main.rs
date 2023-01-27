@@ -1,31 +1,42 @@
-use std::io;
+use yew::prelude::*;
+
+enum Msg {
+    AddOne,
+}
+
+struct CounterComponent {
+    count: i64,
+}
+
+impl Component for CounterComponent {
+    type Message = Msg;
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self { count: 0 }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::AddOne => {
+                self.count += 1;
+                ctx.link().send_message(Msg::AddOne);
+                true
+            }
+        }
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let link = _ctx.link();
+        html! {
+            <div class="container">
+              <p>{ self.count }</p>
+              <button onclick={link.callback(|_| Msg::AddOne)}>{ "Click me!" }</button>
+            </div>
+        }
+    }
+}
 
 fn main() {
-    println!("Guess the number!");
-
-    println!("Please input your guess.");
-
-    let mut guess = String::new();
-
-    io::stdin()
-        .read_line(&mut guess)
-        .expect("Failed to read line");
-
-    println!("You guessed: {}", guess);
-
-    let secret_number = 42;
-
-    println!("The secret number is: {}", secret_number);
-
-    // let guess: u32 = guess.trim().parse().expect("Please type a number!");
-
-    // println!("You guessed: {}", guess);
-
-    // if guess == secret_number {
-    //     println!("You win!");
-    // } else if guess < secret_number {
-    //     println!("Too small!");
-    // } else {
-    //     println!("Too big!");
-    // }
+    yew::Renderer::<CounterComponent>::new().render();
 }
